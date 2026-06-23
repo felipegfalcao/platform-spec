@@ -1,0 +1,129 @@
+id: platform-spec/iac/v1
+name: Infrastructure as Code Change Schema
+description: >
+  Schema for changes to infrastructure provisioned via HCL.
+  Applies to Terraform modules, Terragrunt stacks, environment variables,
+  backends, providers, and infrastructure resources.
+
+version: "1.0.0"
+
+artifacts:
+  - id: proposal
+    file: templates/proposal.md
+    required: true
+    order: 1
+    description: >
+      Describes the infrastructure problem, motivation, and proposed solution.
+      Must include impact on other teams that depend on the resources.
+
+  - id: impact-analysis
+    file: templates/impact-analysis.md
+    required: true
+    order: 2
+    description: >
+      Mandatory analysis: affected modules, destroyed/recreated resources,
+      downstream dependencies, required state manipulation.
+    gates:
+      - resources-identified
+      - destroy-create-assessed
+      - downstream-dependencies-mapped
+
+  - id: design
+    file: templates/design.md
+    required: true
+    order: 3
+    description: >
+      Technical specification: HCL changes, expected terraform plan output,
+      Terragrunt hierarchy structure, input variables.
+
+  - id: runbook
+    file: templates/runbook.md
+    required: true
+    order: 4
+    description: >
+      Operational procedure with PRE-APPLY (fmt, validate, plan, security scan),
+      APPLY (exact commands with flags), VERIFY, and ROLLBACK (state manipulation).
+    gates:
+      - plan-output-documented
+      - rollback-state-strategy-defined
+      - security-scan-clean
+
+  - id: tasks
+    file: templates/tasks.md
+    required: true
+    order: 5
+    description: >
+      Executable tasks with owner, execution environment (staging first),
+      exact commands, and verifiable success criteria.
+
+sequence: [proposal, impact-analysis, design, runbook, tasks]
+
+context:
+  required:
+    - context/terragrunt.md
+  optional:
+    - context/slo-budget.md
+    - context/rollback-patterns.md
+
+validation:
+  checklist: validation/iac-checklist.md
+
+frontmatter:
+  schema: iac
+  required_fields:
+    - change-type
+    - blast-radius
+    - slo-impact
+    - change-window
+    - author
+    - date
+  additional_fields:
+    - destroy-and-recreate: true | false
+    - state-manipulation: true | false
+    - affects-other-teams: true | false
+  blast-radius:
+    values: [low, medium, high, critical]
+    escalation:
+      high: change-window-required + sre-lead-approval
+      critical: change-window-required + incident-commander + exec-notification
+
+change-types:
+  additive:
+    description: Creates new resources without affecting existing ones
+    examples:
+      - Add a new S3 bucket module for logs
+      - Create a new IAM role for a service
+      - Add a new security group rule (allow)
+    risk: low
+    destroy-recreate: false
+
+  modificative:
+    description: Modifies attributes of existing resources without destroying them
+    examples:
+      - Modify resource tags
+      - Change RDS instance size (requires maintenance window)
+      - Update an existing IAM policy
+    risk: medium
+    destroy-recreate: conditional
+
+  destructive:
+    description: Removes resources or forces destroy+recreate
+    examples:
+      - Delete a security group in use
+      - Change database engine (destroy+recreate)
+      - Modify a ForceNew attribute of an AWS resource
+    risk: high
+    destroy-recreate: true
+    requires-change-window: true
+    requires-data-backup: conditional
+
+validation-tools:
+  required:
+    - terragrunt hclfmt --check
+    - terragrunt validate
+    - terragrunt plan
+    - checkov --compact --quiet
+    - tflint
+  optional:
+    - infracost diff
+    - terraform-docs

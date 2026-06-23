@@ -1,0 +1,56 @@
+name: Feature Request
+description: Suggest a new schema, template section, CLI command, or framework rule.
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening, check [Discussions](https://github.com/felipegfalcao/platform-spec/discussions)
+        to see if this has been proposed before.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - New schema
+        - Template — new section or field
+        - AGENTS.md — new classification rule
+        - context/ — new knowledge base document
+        - validation/ — new checklist gate
+        - CLI — new command or option
+        - Examples — new example scenario
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What operational gap or pain point does this address? Include a real SRE scenario.
+      placeholder: "When deploying a new ArgoCD plugin, there is no schema that covers the plugin configuration lifecycle..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What would you like the framework to include or do differently?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches did you consider? Why are they insufficient?
+
+  - type: checkboxes
+    id: willing_to_contribute
+    attributes:
+      label: Contribution
+      options:
+        - label: I am willing to open a PR for this feature.

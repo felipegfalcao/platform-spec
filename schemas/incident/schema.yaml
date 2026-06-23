@@ -1,0 +1,62 @@
+id: platform-spec/incident/v1
+name: Incident Schema
+description: >
+  Schema for documenting incidents that have occurred.
+  Inverted flow: learn first (postmortem → rca), then document
+  the operational procedure (runbook).
+  No code or infrastructure is changed directly under this schema.
+
+version: "1.0.0"
+
+artifacts:
+  - id: postmortem
+    file: templates/postmortem.md
+    required: true
+    order: 1
+    description: >
+      Chronological incident document: timeline, impact, contributing factors.
+      Must be opened within 24 hours of resolution.
+    gates:
+      - timeline-complete
+      - impact-measured
+      - contributing-factors-identified
+
+  - id: rca
+    file: templates/rca.md
+    required: true
+    order: 2
+    description: >
+      Root cause analysis using 5 Whys or Fishbone. Trackable action items
+      with owner and deadline. Approved by Tech Lead or EM.
+    gates:
+      - root-cause-identified
+      - action-items-have-owners
+      - action-items-have-deadlines
+
+  - id: runbook
+    file: templates/runbook.md
+    required: false
+    order: 3
+    description: >
+      Operational runbook created or updated based on lessons learned from
+      the postmortem and RCA. Becomes the reference for the next similar incident.
+      May be omitted if the incident did not result in a new procedure.
+
+sequence: [postmortem, rca, runbook]
+
+context:
+  required:
+    - context/rollback-patterns.md
+  optional:
+    - context/slo-budget.md
+
+principles:
+  - blameless: >
+      Postmortems are blameless. The focus is on systems and processes,
+      not on individuals. Avoid language that assigns personal blame.
+  - timeline-first: >
+      The timeline must be built with objective data (logs, metrics,
+      alerts) before any analysis. Facts first, interpretation second.
+  - action-items-required: >
+      Every postmortem must generate at least 1 trackable action item.
+      "Training" without a deadline and owner is not a valid action item.

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or Discussion
+    url: https://github.com/felipegfalcao/platform-spec/discussions
+    about: Ask questions and discuss Platform Spec in GitHub Discussions.
+  - name: Schema Feedback
+    url: https://github.com/felipegfalcao/platform-spec/discussions/categories/schemas
+    about: Feedback on specific schemas (gitops, iac, observability, incident).

@@ -1,0 +1,64 @@
+id: platform-spec/observability/v1
+name: Observability Change Schema
+description: >
+  Schema for changes to the observability layer: Prometheus alerts,
+  Grafana dashboards, SLO definitions, recording rules, and notification policies.
+
+version: "1.0.0"
+
+artifacts:
+  - id: proposal
+    file: templates/proposal.md
+    required: true
+    order: 1
+
+  - id: impact-analysis
+    file: templates/impact-analysis.md
+    required: true
+    order: 2
+    gates:
+      - slo-impact-calculated
+      - alert-coverage-assessed
+      - notification-routing-verified
+
+  - id: design
+    file: templates/design.md
+    required: true
+    order: 3
+    description: >
+      Technical specification: validated PromQL, justified thresholds,
+      routing configuration, versioned dashboard JSON.
+
+  - id: runbook
+    file: templates/runbook.md
+    required: true
+    order: 4
+    gates:
+      - query-validated-staging
+      - silence-configured
+      - rollback-rule-ready
+
+  - id: tasks
+    file: templates/tasks.md
+    required: true
+    order: 5
+
+sequence: [proposal, impact-analysis, design, runbook, tasks]
+
+context:
+  required:
+    - context/slo-budget.md
+  optional:
+    - context/rollback-patterns.md
+
+validation:
+  checklist: validation/observability-checklist.md
+
+alert-severity:
+  warning:
+    action: notify-slack
+    paging: false
+  critical:
+    action: page-oncall
+    paging: true
+    requires-runbook: true

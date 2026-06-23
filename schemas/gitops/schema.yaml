@@ -1,0 +1,119 @@
+id: platform-spec/gitops/v1
+name: GitOps Change Schema
+description: >
+  Schema for changes to the declarative deployment plan managed by ArgoCD.
+  Applies to ApplicationSet, Application, App-of-Apps, Helm values, and Kustomize overlays.
+
+version: "1.0.0"
+
+artifacts:
+  - id: proposal
+    file: templates/proposal.md
+    required: true
+    order: 1
+    description: >
+      Describes the problem, motivation, and proposed solution at a high level.
+      Must be approved by the team before proceeding.
+
+  - id: impact-analysis
+    file: templates/impact-analysis.md
+    required: true
+    order: 2
+    description: >
+      Mandatory impact analysis: affected clusters, modified ApplicationSets,
+      change type, error budget consumption, and blast radius.
+    gates:
+      - clusters-identified
+      - blast-radius-assessed
+      - change-window-determined
+
+  - id: design
+    file: templates/design.md
+    required: true
+    order: 3
+    description: >
+      Detailed technical specification: expected YAML diff, syncPolicy configuration,
+      ApplicationSet structure, generators used.
+
+  - id: runbook
+    file: templates/runbook.md
+    required: true
+    order: 4
+    description: >
+      Operational procedure with PRE-APPLY, APPLY, VERIFY, and ROLLBACK sections.
+      Commands must be exact and ready to copy and execute.
+    gates:
+      - pre-apply-validations-defined
+      - rollback-commands-ready
+      - verify-criteria-objective
+
+  - id: tasks
+    file: templates/tasks.md
+    required: true
+    order: 5
+    description: >
+      List of executable tasks derived from the runbook. Each task has an owner,
+      time estimate, exact command, and success criterion.
+
+sequence: [proposal, impact-analysis, design, runbook, tasks]
+
+context:
+  required:
+    - context/argocd.md
+  optional:
+    - context/slo-budget.md
+    - context/rollback-patterns.md
+
+validation:
+  checklist: validation/gitops-checklist.md
+
+frontmatter:
+  schema: gitops
+  required_fields:
+    - change-type
+    - blast-radius
+    - slo-impact
+    - change-window
+    - author
+    - date
+  change-type:
+    values: [additive, modificative, destructive]
+  blast-radius:
+    values: [low, medium, high, critical]
+    escalation:
+      medium: change-window-recommended
+      high: change-window-required
+      critical: change-window-required + incident-commander
+  slo-impact:
+    values: ["none", "<0.01%", "0.01-0.1%", ">0.1%"]
+    threshold:
+      ">0.1%": requires-budget-approval
+
+change-types:
+  additive:
+    description: Adds new Applications or ApplicationSets without modifying existing ones
+    examples:
+      - Add a new cluster to an ApplicationSet generator
+      - Create an Application for a new service
+      - Add a new Kustomize overlay for an additional environment
+    risk: low
+    prune-concern: false
+
+  modificative:
+    description: Modifies the configuration of existing ArgoCD resources
+    examples:
+      - Change syncPolicy from manual to automated
+      - Modify targetRevision from branch to SHA
+      - Update Helm values in production
+    risk: medium
+    prune-concern: true
+
+  destructive:
+    description: Removes Applications, ApplicationSets, or triggers a sync that deletes resources
+    examples:
+      - Delete an Application for a production service
+      - Enable prune on an existing ApplicationSet
+      - Remove a cluster from a generator (orphaning resources)
+    risk: high
+    prune-concern: true
+    requires-change-window: true

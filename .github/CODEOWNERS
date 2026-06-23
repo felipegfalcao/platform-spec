@@ -1,0 +1,19 @@
+# CODEOWNERS
+# Each line assigns ownership to a path. The last matching rule wins.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+*                               @felipegfalcao
+
+# AGENTS.md is the most critical file — requires explicit review
+AGENTS.md                       @felipegfalcao
+
+# Schema changes require schema owner review
+schemas/                        @felipegfalcao
+context/                        @felipegfalcao
+
+# CLI source
+src/                            @felipegfalcao
+
+# CI workflows
+.github/workflows/              @felipegfalcao

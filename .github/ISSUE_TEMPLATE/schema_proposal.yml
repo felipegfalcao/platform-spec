@@ -1,0 +1,55 @@
+name: Schema Proposal
+description: Propose changes to an existing schema or a new one for a different SRE domain.
+title: "[Schema]: "
+labels: ["schema", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Schema changes affect how AI agents classify and process changes.
+        A strong proposal includes a real incident or scenario that motivated it.
+
+  - type: dropdown
+    id: schema
+    attributes:
+      label: Target schema
+      options:
+        - gitops (existing)
+        - iac (existing)
+        - observability (existing)
+        - incident (existing)
+        - New schema (describe below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation — the real scenario
+      description: >
+        Describe the specific operational scenario that this schema change would handle better.
+        Generic requests ("would be nice to have") are not actionable.
+        Anchor this to a real change type, incident, or gap you've experienced.
+      placeholder: |
+        We deploy Prometheus recording rules separately from alerting rules,
+        but the current observability schema treats them identically.
+        When a recording rule changes a metric label, it silently breaks downstream
+        alerts — an impact that the current design.md template doesn't capture.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_artifact
+    attributes:
+      label: Proposed artifact change
+      description: What exactly should change in the template, schema.yaml, or AGENTS.md?
+      placeholder: |
+        Add a section to observability/templates/impact-analysis.md:
+        "## 6. Recording rule downstream consumers"
+        with a PSPEC:REQUIRED marker listing alerts that reference this recording rule.
+
+  - type: textarea
+    id: backward_compat
+    attributes:
+      label: Backward compatibility
+      description: Would this change break existing filled templates? How should migration work?

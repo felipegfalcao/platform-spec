@@ -1,0 +1,12 @@
+# Normalize line endings to LF on all platforms
+* text=auto eol=lf
+
+# Force binary files to not be modified
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+
+# Mark generated files
+CHANGELOG.md export-subst

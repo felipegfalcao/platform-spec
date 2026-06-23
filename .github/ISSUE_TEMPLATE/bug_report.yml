@@ -1,0 +1,66 @@
+name: Bug Report
+description: Report incorrect behavior in a template, schema rule, or CLI command.
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill in the sections below.
+        For questions, use [Discussions](https://github.com/felipegfalcao/platform-spec/discussions) instead.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      description: Which part of Platform Spec is affected?
+      options:
+        - Schema — gitops
+        - Schema — iac
+        - Schema — observability
+        - Schema — incident
+        - Template content
+        - AGENTS.md classification rules
+        - context/ knowledge base
+        - validation/ checklist
+        - CLI (pspec command)
+        - Documentation
+        - CI / tooling
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug description
+      description: What is incorrect? Be specific — quote the template section or CLI output.
+      placeholder: "The `impact-analysis.md` template for the `iac` schema is missing the `destroy-and-recreate` field verification step in section 2."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should the template, schema rule, or CLI do instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: How can a maintainer reproduce or verify this bug?
+      placeholder: |
+        1. Copy `schemas/iac/templates/impact-analysis.md`
+        2. Fill section 2 (Destroy and recreate)
+        3. Notice that...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Platform Spec version
+      description: Run `pspec --version` or check the latest release tag.
+      placeholder: "0.1.0 or git SHA"
