@@ -34,7 +34,9 @@ body:
     attributes:
       label: Bug description
       description: What is incorrect? Be specific — quote the template section or CLI output.
-      placeholder: "The `impact-analysis.md` template for the `iac` schema is missing the `destroy-and-recreate` field verification step in section 2."
+      placeholder: |
+        The `impact-analysis.md` template for the `iac` schema is missing
+        the `destroy-and-recreate` field verification step in section 2.
     validations:
       required: true
 

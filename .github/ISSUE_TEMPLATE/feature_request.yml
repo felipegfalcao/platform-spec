@@ -30,7 +30,9 @@ body:
     attributes:
       label: Problem statement
       description: What operational gap or pain point does this address? Include a real SRE scenario.
-      placeholder: "When deploying a new ArgoCD plugin, there is no schema that covers the plugin configuration lifecycle..."
+      placeholder: |
+        When deploying a new ArgoCD plugin, there is no schema that covers
+        the plugin configuration lifecycle...
     validations:
       required: true
 
