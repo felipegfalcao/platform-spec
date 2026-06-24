@@ -5,7 +5,7 @@ from rich import print as rprint
 from rich.console import Console
 
 from pspec import __version__
-from pspec.commands import apply, init, propose, validate
+from pspec.commands import apply, init, propose, setup, validate
 
 app = typer.Typer(
     name="pspec",
@@ -16,6 +16,7 @@ app = typer.Typer(
 
 console = Console()
 
+app.add_typer(setup.app, name="setup")
 app.add_typer(init.app, name="init")
 app.add_typer(propose.app, name="propose")
 app.add_typer(validate.app, name="validate")
