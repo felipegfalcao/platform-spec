@@ -18,7 +18,7 @@ If the change also affects Terraform/Terragrunt, read the **MIXED changes** sect
 
 ## Artifact sequence
 
-```
+```text
 proposal → impact-analysis → design → runbook → tasks
 ```
 

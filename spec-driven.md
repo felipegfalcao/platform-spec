@@ -40,7 +40,7 @@ In software development, a spec might be an RFC, a design doc, or a ticket with
 acceptance criteria. In infrastructure, the equivalent is a sequence of artifacts
 that capture the full lifecycle of a change:
 
-```
+```text
 proposal → impact-analysis → design → runbook → tasks
 ```
 

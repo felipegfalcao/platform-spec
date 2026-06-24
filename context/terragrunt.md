@@ -13,6 +13,7 @@ O padrão Composite/Component é a base de toda organização HCL neste reposit�
 Um **Component** é um módulo Terraform reutilizável que encapsula um grupo de recursos relacionados.
 
 **Regras de Component**:
+
 1. **Recebe tudo via input variables** — zero valores hardcoded
 2. **Zero data sources** — não faz lookups no AWS, nunca
 3. **Zero referências a outros módulos** — completamente independente
@@ -38,6 +39,7 @@ data "aws_vpc" "main" {          # ← data source em Component é PROIBIDO
 Um **Composite** é um `terragrunt.hcl` que instancia um Component e fornece todos os inputs concretos.
 
 **Regras de Composite**:
+
 1. **Define inputs concretos** por ambiente
 2. **Contém data sources** — aqui é o lugar correto para lookups
 3. **Declara dependencies** para outros Composites
@@ -77,7 +79,7 @@ inputs = {
 
 ## 2. Hierarquia de arquivos
 
-```
+```text
 infra-repo/
 ├── root.hcl                    ← configuração global: backend, provider, tags globais
 ├── envs/
@@ -291,7 +293,8 @@ resource "aws_db_instance" "this" {
 ### State files
 
 O path do state é gerado automaticamente pela configuração `key` do `root.hcl`:
-```
+
+```bash
 {bucket}/{path_relative_to_include}/terraform.tfstate
 → my-tfstate-bucket/envs/prod/us-east-1/databases/api-db/terraform.tfstate
 ```

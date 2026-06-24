@@ -24,6 +24,7 @@ status: # draft | review | approved
 **Root cause**: Absence of an operational impact validation gate for infrastructure configuration changes, allowing high-risk changes to be applied to production without review or a change window.
 
 *Distinguish from the trigger event*:
+
 - **Trigger event** (what triggered the incident): Change of `max_connections: 50 → 10` in the Redis ConfigMap
 - **Root cause** (why the trigger could happen): Without a review gate, any engineer can modify critical configuration without impact analysis
 
@@ -80,6 +81,7 @@ status: # draft | review | approved
 - **Completion criterion**: PR merged with PR template for ConfigMaps including "max_connections documented and validated" field
 
 **Scope**: Create PR template at `.github/PULL_REQUEST_TEMPLATE/configmap_change.md` with checklist:
+
 - [ ] Maximum connection/resource values documented in the design
 - [ ] Production impact assessed (link to Platform Spec impact-analysis)
 - [ ] Change window scheduled if blast radius ≥ medium
@@ -94,6 +96,7 @@ status: # draft | review | approved
 - **Completion criterion**: CI pipeline blocks merge of ConfigMap with `max_connections < 20` without explicit SRE approval
 
 **Scope**: Validation script in GitHub Actions that:
+
 1. Detects changes in ConfigMaps with label `component=redis`
 2. Validates that `max_connections >= 20` OR requires additional SRE approval
 3. Adds a comment on the PR with automatic impact analysis

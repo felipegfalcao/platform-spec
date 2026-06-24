@@ -51,6 +51,7 @@ kubectl label secret cluster-staging-us-east-1 -n argocd platform/frontend=true
 - **Estimate**: 20 minutes
 
 **Steps**:
+
 1. Create branch `feat/frontend-appset-cluster-generator`
 2. Edit `infrastructure/argocd/appsets/frontend-apps.yaml` per design.md section 3
 3. Verify diff: `git diff HEAD infrastructure/argocd/appsets/frontend-apps.yaml`
@@ -80,7 +81,7 @@ gh pr create --title "feat(gitops): migrate frontend-apps ApplicationSet to clus
 - **Deadline**: 1 hour before the change window
 - **Estimate**: 5 minutes
 
-```
+```text
 Message for #frontend-eng:
 "[Platform SRE] Planned maintenance tomorrow DD/MM HH:MM-HH:MM EST on ApplicationSet
  frontend-apps. Service will not be interrupted. Questions: @sre-engineer"
@@ -220,7 +221,7 @@ kubectl get applicationset frontend-apps -n argocd \
 - **Owner**: @executor
 - **Estimate**: 5 minutes
 
-```
+```text
 Message for #oncall-sre:
 "✅ Change window completed successfully: frontend-apps ApplicationSet migrated to
  cluster generator. 3 Applications in Synced+Healthy across 3 clusters.

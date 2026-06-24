@@ -77,6 +77,7 @@ uvx ruff format src/
 ### Why impact-analysis before design?
 
 Design without knowing the blast radius is the root cause of most platform incidents. The framework enforces the impact-analysis → design order because:
+
 1. Design decisions (e.g., which generator to use) depend on blast radius
 2. Reviewers need impact context to review design meaningfully
 3. Runbook rollback procedures depend on impact-analysis data

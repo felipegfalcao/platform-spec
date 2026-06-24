@@ -109,7 +109,7 @@ Complete all items before executing any GitOps task. A task marked as executable
 
 ## Quick reference: rollback decision
 
-```
+```bash
 ApplicationSet generates wrong number of apps?    → ROLLBACK NOW (Pattern 1: git revert)
 Application enters Degraded state?                → Wait 2 min → if not self-healing → ROLLBACK
 Error rate spike in services?                     → If > threshold in runbook → ROLLBACK

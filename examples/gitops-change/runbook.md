@@ -39,13 +39,15 @@ kubectl get secrets -n argocd \
 ```
 
 **Expected output**:
-```
+
+```text
 cluster-prod-us-east-1      true
 cluster-prod-eu-west-1      true
 cluster-staging-us-east-1   true
 ```
 
 **STOP if**: Any cluster missing the `true` label. Apply the label first:
+
 ```bash
 kubectl label secret <cluster-secret-name> -n argocd platform/frontend=true
 ```
@@ -85,6 +87,7 @@ Expected time for reconciliation: < 2 minutes after merge.
 ```bash
 argocd app list -l app.kubernetes.io/managed-by=frontend-apps --output name | wc -l
 ```
+
 **Success criterion**: output = `3`
 
 ### V2 — All Applications Synced + Healthy
@@ -93,6 +96,7 @@ argocd app list -l app.kubernetes.io/managed-by=frontend-apps --output name | wc
 argocd app list -l app.kubernetes.io/managed-by=frontend-apps \
   -o json | jq '[.[] | {name: .metadata.name, sync: .status.sync.status, health: .status.health.status}]'
 ```
+
 **Success criterion**: `sync: "Synced"` and `health: "Healthy"` for all 3 Applications.
 
 ### V3 — Generator confirmed as cluster type
@@ -101,6 +105,7 @@ argocd app list -l app.kubernetes.io/managed-by=frontend-apps \
 kubectl get applicationset frontend-apps -n argocd \
   -o jsonpath='{.spec.generators[0]}' | grep -c clusters
 ```
+
 **Success criterion**: output = `1`
 
 **Maximum time to meet all criteria**: 10 minutes after merge. If not met, execute ROLLBACK.
@@ -139,7 +144,8 @@ kubectl get applicationset frontend-apps -n argocd \
 ### R3 — Communicate
 
 Post in `#oncall-sre`:
-```
+
+```text
 ⚠️ ROLLBACK executed: frontend-apps ApplicationSet reverted to list generator.
 Reason: [describe symptom]. Current state: [Synced/Degraded].
 Change window closed. Opening postmortem.

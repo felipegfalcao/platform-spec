@@ -141,7 +141,7 @@ aws rds wait db-instance-available --db-instance-identifier api-prod --region us
 
 ## Phase 4: Close-out
 
-```
+```text
 #oncall-sre: ✅ Change window completed: api-db migrated to gp3 in staging and prod.
  StorageType=gp3, Iops=6000 confirmed. API p99: 145ms (was 850ms).
  Duration: 47 min. Cost savings: $86/month. No deviations from runbook.

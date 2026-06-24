@@ -63,6 +63,7 @@ No downstream stacks need to be re-applied.
 **Classified as**: `medium`
 
 **Failure scenario: I/O degradation during modification window**
+
 - Symptom: RDS in `modifying` state, queries see increased latency
 - Duration: 5–15 minutes (AWS modification time)
 - Affected services: api-backend (writes), data-pipeline (reads)
@@ -94,9 +95,11 @@ No downstream stacks need to be re-applied.
 ## 7. Rollback triggers
 
 **STOP before prod apply if**:
+
 - Staging apply caused downtime > 2 minutes
 - `terraform plan` on prod shows any `-/+` for RDS instance
 
 **ROLLBACK post-apply if**:
+
 - API p99 remains > 500ms for 10 consecutive minutes
 - API error rate > 2% for 2 consecutive minutes

@@ -46,13 +46,15 @@ kubectl get secrets -n argocd \
 ```
 
 **Expected output**:
-```
+
+```text
 cluster-prod-us-east-1      true
 cluster-prod-eu-west-1      true
 cluster-staging-us-east-1   true
 ```
 
 **STOP if**: Any cluster appears without the `true` label. Apply the label before proceeding:
+
 ```bash
 kubectl label secret <cluster-secret-name> -n argocd platform/frontend=true
 ```
@@ -148,6 +150,7 @@ argocd app list -l app.kubernetes.io/managed-by=frontend-apps
 ```bash
 argocd app list -l app.kubernetes.io/managed-by=frontend-apps --output name | wc -l
 ```
+
 **Success criterion**: output = `3`
 
 ### V2 — All Applications in Synced + Healthy
@@ -156,6 +159,7 @@ argocd app list -l app.kubernetes.io/managed-by=frontend-apps --output name | wc
 argocd app list -l app.kubernetes.io/managed-by=frontend-apps \
   -o json | jq '[.[] | {name: .metadata.name, sync: .status.sync.status, health: .status.health.status}]'
 ```
+
 **Success criterion**: `sync: "Synced"` and `health: "Healthy"` for ALL Applications.
 
 ### V3 — Frontend smoke test on each cluster
@@ -195,6 +199,7 @@ kubectl get applicationset frontend-apps -n argocd \
 ### When to roll back
 
 Execute ROLLBACK immediately if any condition occurs:
+
 - Generated Applications < 3 for more than 2 minutes
 - Any Application in `Degraded` or `Unknown` for more than 2 minutes
 - Frontend error rate > 1% for 1 consecutive minute

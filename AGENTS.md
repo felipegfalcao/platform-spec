@@ -10,6 +10,7 @@
 **platform-spec** is a Python CLI (`pspec`) that scaffolds and validates Spec-Driven Development (SDD) artifacts for SRE and Platform Engineering teams. It is not the SDD framework itself — it is the tool that makes the framework usable.
 
 What `pspec` does:
+
 - `pspec init` — creates a change directory and copies the correct schema templates into it
 - `pspec propose` — opens or creates the proposal artifact for a change in progress
 - `pspec validate` — checks that artifacts are complete, sequenced correctly, and pass schema gates
@@ -21,7 +22,7 @@ The SDD framework itself lives in `schemas/` and `scaffold/`. The CLI is the del
 
 ## Repository structure
 
-```
+```text
 platform-spec/
 ├── src/pspec/
 │   ├── __init__.py             # package version (__version__)
@@ -88,6 +89,7 @@ def validate_iac_change(path: Path) -> list[str]: ...
 ### Schemas (`schemas/`)
 
 Schemas are data, not code. A schema directory must contain:
+
 - `schema.yaml` — `id`, `sequence`, `artifact-types`, `required-fields`, `change-types`
 - `README.md` — schema-specific guidance
 - `templates/*.md` — one template per artifact in the sequence, with `PSPEC:REQUIRED` / `PSPEC:OPTIONAL` markers
@@ -117,14 +119,14 @@ def <name>(
     typer.echo(f"pspec <name>: path={path} — not implemented yet")
 ```
 
-2. Register in `src/pspec/cli.py`:
+1. Register in `src/pspec/cli.py`:
 
 ```python
 from pspec.commands import <name>
 app.add_typer(<name>.app, name="<name>")
 ```
 
-3. Add tests in `tests/test_cli.py` (see Testing section below).
+1. Add tests in `tests/test_cli.py` (see Testing section below).
 
 ---
 
@@ -150,9 +152,9 @@ required-fields:
 change-types: [additive, modificative, destructive]
 ```
 
-3. **`README.md`** explaining when to use this schema.
+1. **`README.md`** explaining when to use this schema.
 
-4. **`templates/*.md`** — one file per artifact in the sequence. Each template must start with YAML frontmatter and use `PSPEC:REQUIRED` / `PSPEC:OPTIONAL` markers.
+2. **`templates/*.md`** — one file per artifact in the sequence. Each template must start with YAML frontmatter and use `PSPEC:REQUIRED` / `PSPEC:OPTIONAL` markers.
 
 After creating the schema directory, update:
 
@@ -177,6 +179,7 @@ def validate_<schema>_change(path: Path) -> list[str]:
 The `validate` command (currently a stub) will resolve the validator by schema name and call the entry function.
 
 Validators should check:
+
 - Required frontmatter fields are present and non-empty
 - Artifact sequence is respected (impact-analysis exists before design, etc.)
 - `PSPEC:REQUIRED` comment markers do not appear in the final output (they must be replaced by content)
@@ -215,6 +218,7 @@ def test_init_requires_schema():
 ```
 
 Run all tests:
+
 ```bash
 uv run pytest
 uv run pytest tests/test_cli.py -v        # CLI only
@@ -234,6 +238,7 @@ uv run pytest
 ```
 
 Linting and formatting:
+
 ```bash
 uv run ruff check src/ tests/
 uv run ruff format src/ tests/
@@ -243,7 +248,7 @@ uv run ruff format src/ tests/
 
 ## Branch naming
 
-```
+```text
 <type>/<number>-<short-slug>   # when a GitHub issue exists
 <type>/<short-slug>            # direct PR with no tracking issue
 ```
@@ -257,6 +262,7 @@ uv run ruff format src/ tests/
 | `chore/` | CI, tooling, dependency bumps | `chore/bump-typer-0-27` |
 
 Rules:
+
 - Include the issue number when one exists — it makes branches traceable
 - Use kebab-case, keep the slug short
 - One concern per branch; `feat/` and `fix/` in the same branch is a smell
@@ -267,7 +273,7 @@ Rules:
 
 Every commit with AI-generated content must carry an `Assisted-by:` trailer:
 
-```
+```bash
 feat: implement pspec validate frontmatter check
 
 Assisted-by: Claude Sonnet 4.6 (autonomous)

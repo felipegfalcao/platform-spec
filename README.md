@@ -30,7 +30,7 @@ Platform Spec enforces this discipline through schemas, templates, and validatio
 
 ## Artifact sequence (enforced)
 
-```
+```text
 gitops / iac / observability:
   proposal → impact-analysis → design → runbook → tasks
 
@@ -59,7 +59,7 @@ Read [AGENTS.md](AGENTS.md) — specifically the "Change classification" section
 
 ### 3. Copy the templates
 
-```
+```text
 schemas/<schema>/templates/
 ```
 
@@ -71,7 +71,7 @@ Start with `proposal.md`. Get approval. Then `impact-analysis.md`. Get approval.
 
 Run the schema checklist before any change window:
 
-```
+```text
 validation/gitops-checklist.md
 validation/iac-checklist.md
 validation/observability-checklist.md
@@ -96,7 +96,7 @@ See [AGENTS.md § Mixed changes](AGENTS.md#mixed-changes-iac--gitops) for the fu
 
 ## Repository structure
 
-```
+```text
 platform-spec/
 ├── AGENTS.md              ← AI agent entry point — read this first
 ├── schemas/

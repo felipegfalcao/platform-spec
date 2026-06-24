@@ -26,12 +26,14 @@ status: # draft | review | approved
 **Scenario**: Redis connection pool exhausted, causing `ECONNREFUSED` on all API requests.
 
 **Typical symptoms**:
+
 - Alert `RedisConnectionPoolExhausted` fired
 - 100% error rate on the affected endpoint
 - API logs with `Error: connect ECONNREFUSED` or `maxRetriesPerRequest exceeded`
 - `redis-cli INFO clients` shows `connected_clients` = `maxclients`
 
 **Do NOT use this runbook for**:
+
 - Redis with high latency but no pool exhaustion → see `runbook-redis-performance.md`
 - Redis with corrupted data → see `runbook-redis-data-recovery.md`
 - Total Redis instance failure → see `runbook-redis-failover.md`
@@ -115,6 +117,7 @@ kubectl logs -n api deployment/api-backend --tail=100 | grep -c "ECONNREFUSED"
 ```
 
 **If retry storm → temporary scale down to break the cycle:**
+
 ```bash
 kubectl scale deployment api-backend -n api --replicas=5  # reduce from N to 5
 # Wait for connections to stabilize
@@ -146,6 +149,7 @@ kubectl rollout restart deployment redis -n redis  # if ConfigMap is not hot-rel
 ```
 
 **Verify after rollback**:
+
 ```bash
 watch -n 5 'redis-cli -h redis.internal INFO clients | grep connected_clients'
 # Wait for connected_clients < maxclients
@@ -177,7 +181,7 @@ amtool alert query alertname="RedisConnectionPoolExhausted"
 
 ## RESOLUTION COMMUNICATION
 
-```
+```text
 #incident: "✅ RESOLVED: Redis pool exhausted in [service] resolved at HH:MM UTC.
  Cause: [configuration X / load spike Y].
  Action taken: [ConfigMap rollback / scale down / maxclients increased].

@@ -76,11 +76,13 @@ status: # draft | review | approved
 **Why detection was slow**: The connection pool alert only fires after 5 minutes of exhaustion. The deploy was made during a low-traffic period — load increased gradually until the pool was exhausted at 14:23.
 
 **What worked well**:
+
 - Automatic alert detected and paged correctly
 - On-call responded in < 3 minutes
 - #incident channel created quickly with the right stakeholders
 
 **What did not work well**:
+
 - Rollback took 6 extra minutes due to lack of a runbook for Redis configuration
 - Config deploy had no change window or blast radius review
 - Available runbook covered Redis restart, not configuration rollback

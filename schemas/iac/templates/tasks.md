@@ -125,7 +125,7 @@ gh pr create --title "feat(iac): migrate rds-postgres to gp3 storage type"
 - [ ] P5 — state not locked
 - [ ] P6 — error budget > 20%
 - [ ] Completed — proceed to T6
-- [ ] STOPPED at P___ — reason: ___ (do not advance)
+- [ ] STOPPED at P___— reason:___ (do not advance)
 
 ---
 
@@ -140,6 +140,7 @@ terragrunt apply tfplan-staging
 ```
 
 Wait for `available` status:
+
 ```bash
 aws rds wait db-instance-available --db-instance-identifier api-staging --region us-east-1
 ```
@@ -179,7 +180,8 @@ terraform show tfplan-prod | tail -10
 ```
 
 Notify before apply:
-```
+
+```text
 #oncall-sre: "Starting IAC prod apply — rds-postgres gp3 migration. Runbook: <link>"
 ```
 
@@ -201,6 +203,7 @@ aws rds wait db-instance-available --db-instance-identifier api-prod --region us
 ```
 
 Monitor in parallel:
+
 ```bash
 # Terminal 2: CloudWatch RDS
 watch -n 30 'aws rds describe-db-instances \
@@ -236,7 +239,7 @@ watch -n 10 'kubectl top pods -n api --sort-by cpu'
 
 ### T9c — Close the change window
 
-```
+```text
 #oncall-sre: "✅ Change window completed: rds-postgres migrated to gp3 in staging and production.
  Duration: ___ min. StorageType=gp3, Iops=6000 confirmed.
  Deviations: [none | describe]"

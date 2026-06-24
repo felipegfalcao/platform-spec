@@ -133,7 +133,7 @@ spec:
 
 ## 6. File location in GitOps repository
 
-```
+```text
 gitops-repo/
 └── infrastructure/
     └── argocd/

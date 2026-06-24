@@ -5,6 +5,7 @@
 **Questions and discussions** → [GitHub Discussions](https://github.com/felipegfalcao/platform-spec/discussions)
 
 Use discussions for:
+
 - "How should I classify this change?"
 - "Is this the right schema for my scenario?"
 - "How do I integrate pspec into my team's workflow?"
@@ -12,6 +13,7 @@ Use discussions for:
 **Bug reports** → [GitHub Issues](https://github.com/felipegfalcao/platform-spec/issues/new/choose)
 
 Use bug reports for:
+
 - A template section is missing or incorrect
 - AGENTS.md classification rules are ambiguous or wrong
 - `pspec` CLI produces an error

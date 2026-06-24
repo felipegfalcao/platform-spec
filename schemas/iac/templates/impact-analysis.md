@@ -58,6 +58,7 @@ date: # YYYY-MM-DD
 ### 2.1 Known ForceNew attributes of the resource
 
 The following `aws_db_instance` attributes cause destroy+recreate if modified:
+
 - `engine` (e.g., from postgres to mysql)
 - `engine_version` (major version bump)
 - `identifier` (database name)
@@ -94,6 +95,7 @@ The following `aws_db_instance` attributes cause destroy+recreate if modified:
 No state manipulation required. The change is applied via a normal terraform apply.
 
 **If it were needed** (example for documentation):
+
 ```bash
 # Never run without a state backup first
 terraform state pull > state-backup-$(date +%Y%m%d-%H%M%S).json
@@ -160,11 +162,13 @@ The modification is in-place, without destroy+recreate. The greatest risk is tem
 <!-- PSPEC:REQUIRED -->
 
 Execute IMMEDIATE STOP (before production apply) if:
+
 - Apply in staging caused downtime > 2 minutes in staging
 - `terraform plan` in production shows `-/+` for the RDS instance
 - CloudWatch `CPUUtilization` > 90% before the apply (database already degraded)
 
 Execute ROLLBACK post-apply if:
+
 - API p99 latency remains above 500ms for more than 10 minutes
 - API error rate exceeds 2% for 2 consecutive minutes
 

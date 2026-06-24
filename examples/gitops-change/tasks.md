@@ -59,7 +59,7 @@ gh pr create --title "feat(gitops): migrate frontend-apps to cluster generator"
 
 - **Owner**: @jane-sre | **ETA**: 5 min | **Deadline**: 2024-03-19 13:00 BRT
 
-```
+```text
 #frontend-eng: Platform maintenance tomorrow 14:00-15:00 BRT on ArgoCD frontend-apps.
  No service interruption expected. Questions: @jane-sre
 
@@ -126,7 +126,7 @@ watch -n 5 'argocd app list -l app.kubernetes.io/managed-by=frontend-apps'
 
 ### T8 — Close change window
 
-```
+```text
 #oncall-sre: ✅ Change window completed: frontend-apps migrated to cluster generator.
  3/3 Applications Synced+Healthy. Duration: 13 min. No deviations.
 ```

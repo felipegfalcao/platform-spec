@@ -30,6 +30,7 @@ histogram_quantile(
 ```
 
 **Validation in staging**:
+
 - [ ] Query executed in the staging Prometheus
 - [ ] Returns numeric values (not `NaN` or `no data`)
 - [ ] Value range is reasonable: `[0.05, 0.8]` seconds under normal conditions
@@ -135,7 +136,7 @@ spec:
 
 ## 4. Location in the repository
 
-```
+```text
 monitoring-repo/
 └── alerts/
     └── payment-gateway/
@@ -177,6 +178,7 @@ monitoring-repo/
 <!-- PSPEC:REQUIRED Confirm the alert will be routed correctly without creating a new routing rule. -->
 
 **Existing routing** (in `alertmanager.yaml`):
+
 ```yaml
 - match:
     team: payment
@@ -188,6 +190,7 @@ monitoring-repo/
 ```
 
 **The new alert has `team: payment`** — it will be routed automatically to:
+
 - `warning` → Slack `#alerts-payment`
 - `critical` → PagerDuty, `payment-oncall` rotation
 

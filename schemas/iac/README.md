@@ -18,7 +18,7 @@ If the change also affects ArgoCD/GitOps, read the **MIXED changes** section in 
 
 ## Artifact sequence
 
-```
+```text
 proposal → impact-analysis → design → runbook → tasks
 ```
 

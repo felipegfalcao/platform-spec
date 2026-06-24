@@ -27,6 +27,7 @@ Before creating any artifact, classify the change into one of the four schemas b
 **Indicates**: the change affects the declarative deployment plan managed by ArgoCD.
 
 **Triggers** (any one of these is sufficient):
+
 - Creation, modification, or deletion of an `ApplicationSet`
 - Creation, modification, or deletion of an `Application` CRD
 - Changes to App-of-Apps structure (bootstrap, parent apps)
@@ -47,6 +48,7 @@ Before creating any artifact, classify the change into one of the four schemas b
 **Indicates**: the change affects infrastructure provisioned via HCL code.
 
 **Triggers** (any one of these is sufficient):
+
 - Creation, modification, or deletion of Terraform modules
 - Changes to `terragrunt.hcl` (inputs, dependencies, source)
 - Changes to hierarchy files: `root.hcl`, `env.hcl`, `region.hcl`
@@ -66,6 +68,7 @@ Before creating any artifact, classify the change into one of the four schemas b
 **Indicates**: the change affects the observability layer and SLO contracts.
 
 **Triggers** (any one of these is sufficient):
+
 - Creation, modification, or deletion of Prometheus alerts (AlertRule, PrometheusRule)
 - Creation, modification, or deletion of Grafana dashboards
 - Creation, modification, or changes to SLO definitions
@@ -85,6 +88,7 @@ Before creating any artifact, classify the change into one of the four schemas b
 **Indicates**: an incident occurred and needs to be documented, or an operational runbook needs to be created or updated.
 
 **Triggers** (any one of these is sufficient):
+
 - Production incident resolved (requires postmortem)
 - Service degradation that paged on-call
 - Creation or update of an existing operational runbook
@@ -107,6 +111,7 @@ When a change affects both infrastructure and the deployment plan:
 **Reason**: ArgoCD references resources created by Terraform (namespaces, secrets, service accounts, IAM roles). Applying GITOPS before IAC results in an Application with status `Degraded` or `Unknown` until the resource exists.
 
 **Mandatory sequence**:
+
 1. Create the complete IAC change (proposal → impact-analysis → design → runbook → tasks)
 2. Create the complete GITOPS change referencing the IAC change as a prerequisite
 3. In the `dependencies` field of the GITOPS impact-analysis, reference the IAC change ID
@@ -119,7 +124,7 @@ When a change affects both infrastructure and the deployment plan:
 
 The sequence below is **inviolable**. No artifact may be created out of order.
 
-```
+```text
 GITOPS:        proposal → impact-analysis → design → runbook → tasks
 IAC:           proposal → impact-analysis → design → runbook → tasks
 OBSERVABILITY: proposal → impact-analysis → design → runbook → tasks
@@ -148,6 +153,7 @@ INCIDENT:      postmortem → rca → runbook
 These gates must be completed before marking any task as executable.
 
 ### GITOPS gates
+
 - [ ] `kubectl diff` executed and output reviewed
 - [ ] ApplicationSet dry-run without template errors
 - [ ] `argocd app diff` for each affected Application
@@ -156,6 +162,7 @@ These gates must be completed before marking any task as executable.
 - Full checklist: `validation/gitops-checklist.md`
 
 ### IAC gates
+
 - [ ] `terragrunt hclfmt` without diff
 - [ ] `terragrunt validate` without errors
 - [ ] `terragrunt plan` output reviewed and approved
@@ -165,6 +172,7 @@ These gates must be completed before marking any task as executable.
 - Full checklist: `validation/iac-checklist.md`
 
 ### OBSERVABILITY gates
+
 - [ ] PromQL query validated against staging environment
 - [ ] Alert rule tested with `amtool check-config`
 - [ ] SLO impact calculated and documented in impact-analysis
@@ -173,6 +181,7 @@ These gates must be completed before marking any task as executable.
 - Full checklist: `validation/observability-checklist.md`
 
 ### INCIDENT gates
+
 - No deploy gates — INCIDENT is documentation
 - Postmortem requires review by at least two SREs
 - RCA requires approval from Tech Lead or Engineering Manager
@@ -197,6 +206,7 @@ date: YYYY-MM-DD
 ```
 
 **Definitions**:
+
 - `additive`: only adds resources; does not remove or modify existing ones
 - `modificative`: modifies existing resources; behavior changes but the resource remains
 - `destructive`: removes resources, destroys state, or causes intentional downtime
@@ -242,7 +252,7 @@ date: YYYY-MM-DD
 
 ## Repository structure
 
-```
+```text
 <your-repo>/
 ├── AGENTS.md              ← you are here
 ├── schemas/               ← Platform Spec schemas (do not edit)
