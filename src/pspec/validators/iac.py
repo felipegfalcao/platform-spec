@@ -1,7 +1,6 @@
 """IAC schema validator — validates Terraform/Terragrunt HCL artifacts."""
 
 from pathlib import Path
-from typing import Any
 
 
 def validate_iac_change(path: Path) -> list[str]:

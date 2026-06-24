@@ -63,7 +63,7 @@
 
 ## Rollback triggers
 
-```
+```yaml
 Alert fires immediately after deploy without real degradation?   → ROLLBACK (delete PrometheusRule)
 Alert state shows "error" or "unknown"?                         → ROLLBACK (fix PromQL first)
 Cardinality explosion (Prometheus memory spike)?                → ROLLBACK immediately

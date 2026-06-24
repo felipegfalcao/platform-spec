@@ -136,7 +136,7 @@ inputs = {
 
 ### 4.1 Expected plan for staging
 
-```
+```hcl
 Terraform will perform the following actions:
 
   # aws_db_instance.this will be updated in-place
@@ -164,7 +164,7 @@ terraform show -json tfplan | jq '.resource_changes[] | select(.change.actions |
 
 ## 5. File locations in the repository
 
-```
+```text
 infra-repo/
 ├── modules/
 │   └── rds-postgres/
@@ -186,7 +186,7 @@ infra-repo/
 
 <!-- PSPEC:REQUIRED Document how the change fits into the root.hcl > env.hcl > region.hcl > terragrunt.hcl hierarchy. -->
 
-```
+```text
 root.hcl                    ← no change (remote state, provider config)
 └── stacks/prod/env.hcl     ← no change (env-level tags, account)
     └── databases/region.hcl ← no change (region, AZs)
@@ -194,6 +194,7 @@ root.hcl                    ← no change (remote state, provider config)
 ```
 
 **Root.hcl provider config** (verify the AWS provider version supports gp3):
+
 ```hcl
 # Minimum required: hashicorp/aws >= 4.0 (gp3 + storage_throughput support)
 # Current version in root.hcl: verify before apply

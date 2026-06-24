@@ -116,7 +116,7 @@ Complete all items before executing any IAC task. Staging must be fully validate
 
 ## Quick reference: rollback triggers
 
-```
+```text
 Plan shows unexpected destroy?              → STOP — do not apply — review design
 Apply shows ERROR or "1 destroyed" ?        → STOP — assess before continuing to next env
 Resource stuck in "modifying" > 30 min?    → Page SRE Lead — may need AWS support

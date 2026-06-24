@@ -72,7 +72,7 @@ done
 
 - **Owner**: @sre
 
-```
+```text
 #alerts-payment: "New alert PaymentGatewayHighLatency is active.
 Warning: p99 > 500ms for 5min. Critical: p99 > 2s for 2min.
 Runbook: <link>"

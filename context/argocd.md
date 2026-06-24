@@ -8,7 +8,7 @@
 
 ### Estrutura correta
 
-```
+```text
 argocd/
 ├── bootstrap/
 │   └── root-app.yaml          ← Application que o ArgoCD gerencia a si mesmo
@@ -21,7 +21,7 @@ argocd/
 
 ### Hierarquia de bootstrap
 
-```
+```text
 Cluster (manual bootstrap)
 └── root-app (Application CRD aplicado manualmente 1x)
     └── platform-appset (ApplicationSet)
@@ -236,6 +236,7 @@ Em vez de polling, usar ArgoCD Image Updater ou webhooks para triggar sync somen
 ### Sharding do ArgoCD Application Controller
 
 Para > 500 Applications, ativar sharding:
+
 ```yaml
 # argocd-application-controller deployment
 env:
@@ -251,7 +252,7 @@ env:
 
 **Padrão**: `{serviço}-{ambiente}-{região-curta}`
 
-```
+```text
 frontend-prod-us     ✅
 frontend-production-us-east-1  ❌ (muito longo)
 frontend             ❌ (sem ambiente/região — ambíguo)
@@ -261,7 +262,7 @@ frontend             ❌ (sem ambiente/região — ambíguo)
 
 **Padrão**: `{serviço}-apps` ou `{domínio}-apps`
 
-```
+```text
 frontend-apps        ✅
 payment-apps         ✅
 all-services-appset  ❌ (muito genérico)
@@ -271,7 +272,7 @@ all-services-appset  ❌ (muito genérico)
 
 **Padrão**: `{time}` ou `{domínio}`
 
-```
+```text
 platform      ✅
 payment       ✅
 all           ❌ (sem isolamento)

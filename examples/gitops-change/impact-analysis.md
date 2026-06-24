@@ -51,6 +51,7 @@ The existing `frontend-apps` ApplicationSet will have its generator changed from
 **Classified as**: `medium`
 
 **Failure scenario: generator returns no clusters**
+
 - Symptom: ApplicationSet generates 0 Applications
 - Impact: All 3 clusters lose frontend Applications
 - Detection: < 2 minutes (ArgoCD reconciliation loop)
@@ -83,6 +84,7 @@ On-call notified in `#oncall-sre` before starting.
 ## 7. Rollback triggers
 
 Execute rollback immediately if:
+
 - Generated Applications count drops below 3 for more than 2 minutes
 - Any Application transitions from `Synced` to `Degraded`
 - Frontend error rate exceeds 1% for 1 consecutive minute

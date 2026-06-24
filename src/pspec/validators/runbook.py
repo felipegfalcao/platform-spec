@@ -1,7 +1,6 @@
 """Runbook validator — validates that runbooks have all required sections."""
 
 from pathlib import Path
-import re
 
 REQUIRED_SECTIONS_GITOPS_IAC = ["PRE-APPLY", "APPLY", "VERIFY", "ROLLBACK"]
 REQUIRED_SECTIONS_INCIDENT = ["RESPOSTA IMEDIATA", "VERIFY", "ROLLBACK"]

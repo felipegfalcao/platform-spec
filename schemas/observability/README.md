@@ -14,7 +14,7 @@ Use `observability` when the change affects:
 
 ## Sequence
 
-```
+```text
 proposal → impact-analysis → design → runbook → tasks
 ```
 

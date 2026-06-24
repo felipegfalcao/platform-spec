@@ -1,9 +1,9 @@
 """Tests that verify schema directories have the required structure."""
 
 from pathlib import Path
+
 import pytest
 import yaml
-
 
 SCHEMAS = ["gitops", "iac", "observability", "incident"]
 

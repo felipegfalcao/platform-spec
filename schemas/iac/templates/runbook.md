@@ -245,10 +245,12 @@ terragrunt output
 ### When to roll back
 
 **BEFORE production apply** (A4/A5):
+
 - Apply in staging caused downtime > 2 minutes in staging
 - Plan in production shows unexpected destroy
 
 **AFTER production apply**:
+
 - Database status does not return to `available` within 30 minutes
 - API latency remains > 3x baseline for 15 minutes
 - API error rate > 2% for 5 minutes
@@ -311,7 +313,7 @@ terragrunt plan
 
 ### R4 — Communicate and open postmortem
 
-```
+```text
 #oncall-sre: "⚠️ IAC ROLLBACK executed: rds-postgres reverted to gp2.
  Reason: [symptom]. Current state: [available/modifying].
  Opening postmortem — do not retry this change without review."

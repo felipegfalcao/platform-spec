@@ -6,7 +6,7 @@
 
 ## 1. Decision tree: rollback vs. fix forward
 
-```
+```text
 Problem detected in production
          │
          ▼

@@ -61,11 +61,13 @@ See [DEVELOPMENT.md](DEVELOPMENT.md) for full setup instructions.
 1. Fork the repository and create a branch from `main`
 2. Make your changes
 3. Run linters and tests locally:
+
    ```bash
    uvx ruff check src/
    uvx markdownlint-cli2 '**/*.md'
    uv run pytest
    ```
+
 4. Open a PR using the PR template — fill all sections
 5. A maintainer will review within 1 week for bug fixes, 2 weeks for new features
 
@@ -95,7 +97,7 @@ Platform Spec is designed to be used with AI agents, so we welcome AI-assisted c
 
 ## Commit message style
 
-```
+```text
 type(scope): short description
 
 type: feat | fix | docs | chore | refactor | test
@@ -103,7 +105,8 @@ scope: gitops | iac | observability | incident | cli | agents | context | valida
 ```
 
 Examples:
-```
+
+```text
 feat(gitops): add matrix generator example to design template
 fix(iac): correct destroy-and-recreate rollback steps
 docs(agents): clarify MIXED change sequencing rule

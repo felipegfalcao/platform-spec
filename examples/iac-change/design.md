@@ -91,7 +91,7 @@ variable "storage_throughput" {
 
 ## 6. Expected terraform plan output
 
-```
+```hcl
 Terraform will perform the following actions:
 
   # aws_db_instance.this will be updated in-place

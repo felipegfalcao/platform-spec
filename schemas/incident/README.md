@@ -14,7 +14,7 @@ Use `incident` when:
 
 ## Sequence
 
-```
+```text
 postmortem → rca → runbook
 ```
 

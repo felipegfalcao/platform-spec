@@ -11,7 +11,7 @@
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
-If you discover a security vulnerability in Platform Spec, please report it via [GitHub Private Vulnerability Reporting](https://github.com/felipegfalcao/platform-spec/security/advisories/new) or by emailing felipegfalcao.dev@gmail.com.
+If you discover a security vulnerability in Platform Spec, please report it via [GitHub Private Vulnerability Reporting](https://github.com/felipegfalcao/platform-spec/security/advisories/new) or by emailing <felipegfalcao.dev@gmail.com>.
 
 Please include:
 

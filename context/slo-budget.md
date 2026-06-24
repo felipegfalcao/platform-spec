@@ -10,7 +10,7 @@
 
 The error budget is the maximum amount of downtime or errors a service can experience while still meeting its SLO target.
 
-```
+```text
 Error budget = (1 - SLO target) × period duration
 
 Example: 99.9% availability SLO over 30 days
@@ -21,7 +21,7 @@ Error budget = (1 - 0.999) × 30 × 24 × 60 = 43.8 minutes/month
 
 The burn rate measures how fast the error budget is being consumed relative to the allowed rate.
 
-```
+```text
 Burn rate = (error rate observed) / (1 - SLO target)
 
 Example: If your SLO is 99.9% and you're seeing 1% error rate:
@@ -38,7 +38,7 @@ Before filling in the `slo-impact` field in any impact-analysis, calculate the w
 
 ### Formula
 
-```
+```yaml
 Impact % = (estimated outage duration in minutes) / (monthly error budget in minutes) × 100
 
 Example: 5-minute potential outage, 99.9% SLO
@@ -132,6 +132,7 @@ kubectl get slo <slo-name> -n monitoring \
 ### Automatic freeze triggers
 
 A change freeze is declared automatically when:
+
 - Error budget remaining drops below 10% in any rolling 30-day window
 - An active P1 or P2 incident is in progress
 - During pre-declared freeze windows (e.g., Black Friday week, end of quarter)
@@ -158,7 +159,7 @@ A change freeze is declared automatically when:
 
 ### GitOps changes
 
-```
+```bash
 Worst-case impact = time to detect sync failure + time to execute rollback
 
 Typical rollback time for GitOps: 2-5 minutes (git revert + ArgoCD sync)
@@ -170,7 +171,7 @@ Budget impact (99.9% SLO): 8 / 43.8 × 100 = 18.3% → classify as >0.1%
 
 ### IAC changes (in-place modification)
 
-```
+```text
 Worst-case impact = time for AWS resource modification + detection time
 
 Examples:
@@ -183,7 +184,7 @@ RDS modification: 20 min / 43.8 min = 45.7% → critical, requires budget approv
 
 ### Observability changes
 
-```
+```yaml
 Typically slo-impact: none
 Exception: removing a critical alert that is actively preventing a worse incident
 ```
@@ -195,6 +196,7 @@ Exception: removing a critical alert that is actively preventing a worse inciden
 ### Rolling 30-day window (recommended)
 
 The error budget is calculated over the last 30 days from now. This means:
+
 - An incident from 29 days ago still counts against your budget today
 - The budget "recovers" gradually as old incidents fall out of the window
 - More representative of recent reliability

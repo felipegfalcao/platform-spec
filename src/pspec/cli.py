@@ -1,11 +1,11 @@
 """Platform Spec CLI entry point."""
 
 import typer
-from rich.console import Console
 from rich import print as rprint
+from rich.console import Console
 
-from pspec.commands import init, propose, validate, apply
 from pspec import __version__
+from pspec.commands import apply, init, propose, validate
 
 app = typer.Typer(
     name="pspec",

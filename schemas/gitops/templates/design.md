@@ -152,6 +152,7 @@ spec:
 <!-- PSPEC:REQUIRED Document any change to syncPolicy or confirm it remains unchanged. -->
 
 **syncPolicy remains unchanged**:
+
 - `automated: true` — automatic sync maintained
 - `selfHeal: true` — auto-healing maintained
 - `prune: false` — orphaned resources will NOT be deleted automatically (safe for this change)
@@ -177,6 +178,7 @@ metadata:
 ```
 
 **Pre-apply verification**:
+
 ```bash
 kubectl get secrets -n argocd -l argocd.argoproj.io/secret-type=cluster \
   -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.metadata.labels.platform/frontend}{"\n"}{end}'
@@ -188,7 +190,7 @@ Expected output: all clusters listed with value `true`.
 
 <!-- PSPEC:REQUIRED Specify the exact path in the GitOps repository where the change will be made. -->
 
-```
+```text
 gitops-repo/
 └── infrastructure/
     └── argocd/

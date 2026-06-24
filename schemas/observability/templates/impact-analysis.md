@@ -50,10 +50,12 @@ sum(rate(payment_request_duration_seconds_bucket{le="0.5",status=~"2.."}[5m]))
 ```
 
 **Results over the last 30 days**:
+
 - Peaks above 500ms (warning): `N occurrences` — evaluate whether this is acceptable noise
 - Peaks above 2000ms (critical): `N occurrences` — each one should have become a pager
 
 **Threshold decision**:
+
 - Warning 500ms: `X%` of the time alerting — acceptable / adjust to `Y ms`
 - Critical 2000ms: `Z%` of the time alerting — represents real incidents
 
@@ -90,6 +92,7 @@ sum(rate(payment_request_duration_seconds_bucket{le="0.5",status=~"2.."}[5m]))
 ## 7. Rollback trigger
 
 Execute alert rollback if:
+
 - More than 5 `warning` fires in 1 hour without confirmed real degradation (false positive)
 - Pager fired for `critical` when the service was healthy
 - PromQL query causing high memory consumption in Prometheus (cardinality explosion)

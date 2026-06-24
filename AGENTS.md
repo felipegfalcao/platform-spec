@@ -1,256 +1,298 @@
-# AGENTS.md — Platform Spec
+# AGENTS.md — platform-spec
 
-> **This file is the mandatory entry point for any AI agent operating in this repository.**
-> Read this document in full before creating any artifact.
-
----
-
-## What is Platform Spec
-
-Platform Spec is a **Spec-Driven Development (SDD)** framework designed for SRE and Platform Engineering teams. Unlike frameworks oriented toward application code, Platform Spec manages the lifecycle of changes whose final artifact is:
-
-- **Declarative YAML**: ArgoCD ApplicationSet, Application, App-of-Apps, Helm values, Kustomize overlays
-- **Imperative-declarative HCL**: Terraform modules, Terragrunt stacks, environment variables, backends, providers
-- **Observability configuration**: Prometheus alerts, Grafana dashboards, SLOs, recording rules, notification policies
-- **Runbooks and operational procedures**: Postmortems, RCAs, incident runbooks
-
-The framework enforces an artifact sequence that must be respected. No change moves to execution without an approved impact-analysis and a ready runbook.
+> **Entry point for any AI agent contributing to the platform-spec project.**
+> Read this document before creating, modifying, or reviewing any file in this repository.
 
 ---
 
-## Change classification
+## About platform-spec
 
-Before creating any artifact, classify the change into one of the four schemas below. When in doubt, prefer the more restrictive schema.
+**platform-spec** is a Python CLI (`pspec`) that scaffolds and validates Spec-Driven Development (SDD) artifacts for SRE and Platform Engineering teams. It is not the SDD framework itself — it is the tool that makes the framework usable.
 
-### GITOPS
+What `pspec` does:
 
-**Indicates**: the change affects the declarative deployment plan managed by ArgoCD.
+- `pspec init` — creates a change directory and copies the correct schema templates into it
+- `pspec propose` — opens or creates the proposal artifact for a change in progress
+- `pspec validate` — checks that artifacts are complete, sequenced correctly, and pass schema gates
+- `pspec apply` — records a task as executed with its outcome (success / failed / skipped)
 
-**Triggers** (any one of these is sufficient):
-- Creation, modification, or deletion of an `ApplicationSet`
-- Creation, modification, or deletion of an `Application` CRD
-- Changes to App-of-Apps structure (bootstrap, parent apps)
-- Modification of Helm values (`values.yaml`, `values-*.yaml`)
-- Modification of Kustomize overlays (`kustomization.yaml`, patches)
-- Changes to `targetRevision`, `repoURL`, or `path` in any Application
-- Changes to `syncPolicy` (automated → manual, enabling `selfHeal`, `prune`)
-- Adding or removing clusters from an ApplicationSet generator
-- Changes to `ignoreDifferences` or `ignorePaths`
-
-**Schema**: `schemas/gitops/`
-**Required context**: `context/argocd.md`
-
----
-
-### IAC
-
-**Indicates**: the change affects infrastructure provisioned via HCL code.
-
-**Triggers** (any one of these is sufficient):
-- Creation, modification, or deletion of Terraform modules
-- Changes to `terragrunt.hcl` (inputs, dependencies, source)
-- Changes to hierarchy files: `root.hcl`, `env.hcl`, `region.hcl`
-- Changes to environment variables (`.tfvars`, `terraform.tfvars`)
-- Changes to backend (S3 bucket, DynamoDB lock table, state prefix)
-- Changes to providers or provider versions
-- Addition, modification, or removal of infrastructure resources
-- Changes to outputs consumed by other modules via dependency
-
-**Schema**: `schemas/iac/`
-**Required context**: `context/terragrunt.md`
-
----
-
-### OBSERVABILITY
-
-**Indicates**: the change affects the observability layer and SLO contracts.
-
-**Triggers** (any one of these is sufficient):
-- Creation, modification, or deletion of Prometheus alerts (AlertRule, PrometheusRule)
-- Creation, modification, or deletion of Grafana dashboards
-- Creation, modification, or changes to SLO definitions
-- Changes to recording rules
-- Changes to notification policies (alert routing, receivers)
-- Changes to alert thresholds (warning, critical)
-- Changes to alert evaluation windows (`for:` duration)
-- Updates to scrape targets (ServiceMonitor, PodMonitor)
-
-**Schema**: `schemas/observability/`
-**Required context**: `context/slo-budget.md`
-
----
-
-### INCIDENT
-
-**Indicates**: an incident occurred and needs to be documented, or an operational runbook needs to be created or updated.
-
-**Triggers** (any one of these is sufficient):
-- Production incident resolved (requires postmortem)
-- Service degradation that paged on-call
-- Creation or update of an existing operational runbook
-- Formal RCA requested by a stakeholder or customer
-- Incident that consumed >20% of the monthly error budget
-
-**Note**: The INCIDENT flow is inverted — learn first (postmortem → rca), then document the procedure (runbook). No code or infrastructure is changed directly under this schema.
-
-**Schema**: `schemas/incident/`
-**Required context**: `context/rollback-patterns.md`
-
----
-
-## MIXED changes (IAC + GITOPS)
-
-When a change affects both infrastructure and the deployment plan:
-
-**Rule**: Create two separate changes. IAC always first.
-
-**Reason**: ArgoCD references resources created by Terraform (namespaces, secrets, service accounts, IAM roles). Applying GITOPS before IAC results in an Application with status `Degraded` or `Unknown` until the resource exists.
-
-**Mandatory sequence**:
-1. Create the complete IAC change (proposal → impact-analysis → design → runbook → tasks)
-2. Create the complete GITOPS change referencing the IAC change as a prerequisite
-3. In the `dependencies` field of the GITOPS impact-analysis, reference the IAC change ID
-
-**Example**: Provision a new EKS cluster via Terraform and then add it as a destination in an ApplicationSet → two separate changes, EKS first.
-
----
-
-## Artifact sequence by schema
-
-The sequence below is **inviolable**. No artifact may be created out of order.
-
-```
-GITOPS:        proposal → impact-analysis → design → runbook → tasks
-IAC:           proposal → impact-analysis → design → runbook → tasks
-OBSERVABILITY: proposal → impact-analysis → design → runbook → tasks
-INCIDENT:      postmortem → rca → runbook
-```
-
-**Why runbook before tasks?** Tasks are execution units. Executing tasks without an approved runbook means having no documented rollback plan. In SRE, any change without a tested rollback is blocked.
-
----
-
-## context/ files — what to read and when
-
-| Schema | Required file | Content |
-|--------|--------------|---------|
-| GITOPS | `context/argocd.md` | ArgoCD patterns, App-of-Apps, generators, syncPolicy |
-| IAC | `context/terragrunt.md` | Composite/Component pattern, HCL hierarchy, validations |
-| OBSERVABILITY | `context/slo-budget.md` | Burn rate calculation, budget windows, freeze rules |
-| INCIDENT | `context/rollback-patterns.md` | Rollback decision trees by technology |
-
-**Rule**: Read the corresponding context file **before** filling out any template. Templates reference concepts defined in context/.
-
----
-
-## Mandatory validation gates by schema
-
-These gates must be completed before marking any task as executable.
-
-### GITOPS gates
-- [ ] `kubectl diff` executed and output reviewed
-- [ ] ApplicationSet dry-run without template errors
-- [ ] `argocd app diff` for each affected Application
-- [ ] `syncPolicy` review — `prune: true` requires explicit approval in production
-- [ ] Change window approved if blast radius ≥ medium
-- Full checklist: `validation/gitops-checklist.md`
-
-### IAC gates
-- [ ] `terragrunt hclfmt` without diff
-- [ ] `terragrunt validate` without errors
-- [ ] `terragrunt plan` output reviewed and approved
-- [ ] `checkov` without uncategorized critical or high failures
-- [ ] `tflint` without unresolved warnings
-- [ ] State lock confirmed free before apply
-- Full checklist: `validation/iac-checklist.md`
-
-### OBSERVABILITY gates
-- [ ] PromQL query validated against staging environment
-- [ ] Alert rule tested with `amtool check-config`
-- [ ] SLO impact calculated and documented in impact-analysis
-- [ ] Silence configured for post-deploy validation window
-- [ ] Dashboard exported as versioned JSON in the repository
-- Full checklist: `validation/observability-checklist.md`
-
-### INCIDENT gates
-- No deploy gates — INCIDENT is documentation
-- Postmortem requires review by at least two SREs
-- RCA requires approval from Tech Lead or Engineering Manager
-- Runbook resulting from INCIDENT becomes input for the corresponding schema
-
----
-
-## Required frontmatter metadata
-
-Every artifact starts with YAML frontmatter. The fields below are mandatory:
-
-```yaml
----
-schema: gitops | iac | observability | incident
-change-type: additive | modificative | destructive
-blast-radius: low | medium | high | critical
-slo-impact: none | <0.01% | 0.01-0.1% | >0.1%
-change-window: none | scheduled | required
-author: author-name
-date: YYYY-MM-DD
----
-```
-
-**Definitions**:
-- `additive`: only adds resources; does not remove or modify existing ones
-- `modificative`: modifies existing resources; behavior changes but the resource remains
-- `destructive`: removes resources, destroys state, or causes intentional downtime
-
----
-
-## Anti-patterns this framework prevents
-
-| Anti-pattern | How Platform Spec prevents it |
-|-------------|-------------------------------|
-| Applying Terraform without a reviewed plan | Mandatory gate: plan output in the runbook |
-| ArgoCD with `prune: true` in production without review | GitOps checklist forces explicit approval |
-| Improvised rollback during an incident | Runbook with ready-to-run commands is a prerequisite |
-| Change without blast radius analysis | impact-analysis blocks design |
-| IAC and GITOPS in the same PR | MIXED rule: two separate changes, IAC first |
-| Alert without threshold validated in staging | Observability gate: query validated in staging |
-| Postmortem without trackable action items | RCA template forces tasks with owner and deadline |
-
----
-
-## How to use this framework
-
-### For the AI agent
-
-1. Read this file in full
-2. Classify the change using the "Change classification" section
-3. Read the corresponding context/ file
-4. Create artifacts in the correct schema sequence
-5. Fill all fields marked `PSPEC:REQUIRED`
-6. Validate against the schema gates before marking tasks as ready
-
-### For the engineer
-
-1. Identify the change type
-2. Copy the templates from the corresponding schema
-3. Fill out the proposal and request team review
-4. Complete impact-analysis with real data (not vague estimates)
-5. Write the runbook with tested commands
-6. Execute tasks only after the runbook is approved
-7. Document the outcome in tasks (passed/failed, time, deviations)
+The SDD framework itself lives in `schemas/` and `scaffold/`. The CLI is the delivery mechanism for that framework.
 
 ---
 
 ## Repository structure
 
-```
+```text
 platform-spec/
-├── AGENTS.md              ← you are here
-├── schemas/
-│   ├── gitops/            ← schema for ArgoCD changes
-│   ├── iac/               ← schema for Terraform/Terragrunt changes
-│   ├── observability/     ← schema for alerts, dashboards, SLOs
-│   └── incident/          ← schema for postmortems and runbooks
-├── context/               ← domain knowledge base (read before creating artifacts)
-├── validation/            ← per-schema gate checklists
-└── examples/              ← fully filled example changes
+├── src/pspec/
+│   ├── __init__.py             # package version (__version__)
+│   ├── cli.py                  # Typer root app — registers sub-commands
+│   ├── commands/               # one module per CLI command
+│   │   ├── init.py             # pspec init --schema <s> --name <n>
+│   │   ├── propose.py          # pspec propose [PATH]
+│   │   ├── validate.py         # pspec validate [PATH] --schema --strict
+│   │   └── apply.py            # pspec apply [PATH] --task --result
+│   └── validators/             # schema-specific validation logic
+│       ├── __init__.py
+│       ├── gitops.py
+│       ├── iac.py
+│       └── runbook.py
+├── schemas/                    # schema definitions + templates (the framework)
+│   ├── gitops/
+│   │   ├── schema.yaml
+│   │   ├── README.md
+│   │   └── templates/          # proposal, impact-analysis, design, runbook, tasks
+│   ├── iac/
+│   ├── observability/
+│   └── incident/
+├── scaffold/                   # files that pspec init installs into user repositories
+│   └── AGENTS.md               # framework entry point installed in user repos
+├── context/                    # domain knowledge stubs (argocd, terragrunt, slo-budget, rollback-patterns)
+├── validation/                 # gate checklists per schema
+├── examples/                   # fully-filled example changes used in tests
+├── tests/
+│   ├── conftest.py             # shared fixtures (schemas_dir, examples_dir)
+│   ├── test_schemas_structure.py
+│   ├── test_examples_structure.py
+│   └── test_cli.py             # CLI tests via typer.testing.CliRunner
+└── pyproject.toml              # entry point: pspec = "pspec.cli:app"
 ```
+
+---
+
+## Architecture
+
+### CLI layer (`src/pspec/cli.py`)
+
+The root `app` is a `typer.Typer`. Each command lives in its own module under `commands/` and is registered as a sub-Typer:
+
+```python
+app.add_typer(init.app, name="init")
+app.add_typer(validate.app, name="validate")
+```
+
+The `--version` flag is handled by a callback on the root `@app.callback()`.
+
+### Commands (`src/pspec/commands/`)
+
+Each command module exposes a `typer.Typer()` named `app` and a single `@app.callback(invoke_without_command=True)` function. Commands are currently stubs — they print a "not implemented yet" message and exit. Implementing a command means replacing the stub body without changing the function signature or the option definitions.
+
+### Validators (`src/pspec/validators/`)
+
+Validators are pure functions that take a `Path` and return `list[str]` (errors). An empty list means valid. They are schema-specific and are called by the `validate` command.
+
+```python
+def validate_gitops_change(path: Path) -> list[str]: ...
+def validate_iac_change(path: Path) -> list[str]: ...
+```
+
+### Schemas (`schemas/`)
+
+Schemas are data, not code. A schema directory must contain:
+
+- `schema.yaml` — `id`, `sequence`, `artifact-types`, `required-fields`, `change-types`
+- `README.md` — schema-specific guidance
+- `templates/*.md` — one template per artifact in the sequence, with `PSPEC:REQUIRED` / `PSPEC:OPTIONAL` markers
+
+`pspec init` reads `schema.yaml` to know which templates to copy. `pspec validate` reads `schema.yaml` to know the required frontmatter fields and artifact sequence.
+
+---
+
+## Adding a new command
+
+1. Create `src/pspec/commands/<name>.py`:
+
+```python
+"""pspec <name> — short description."""
+
+import typer
+from rich.console import Console
+
+app = typer.Typer(help="One-line description shown in --help.")
+console = Console()
+
+@app.callback(invoke_without_command=True)
+def <name>(
+    path: str = typer.Argument(".", help="..."),
+) -> None:
+    """Docstring shown in pspec <name> --help."""
+    typer.echo(f"pspec <name>: path={path} — not implemented yet")
+```
+
+1. Register in `src/pspec/cli.py`:
+
+```python
+from pspec.commands import <name>
+app.add_typer(<name>.app, name="<name>")
+```
+
+1. Add tests in `tests/test_cli.py` (see Testing section below).
+
+---
+
+## Adding a new schema
+
+A schema requires four things:
+
+1. **Directory**: `schemas/<name>/`
+
+2. **`schema.yaml`** with at minimum:
+
+```yaml
+id: <name>
+sequence:
+  - proposal
+  - impact-analysis
+  - design
+  - runbook
+  - tasks
+artifact-types: [...]
+required-fields:
+  frontmatter: [schema, change-type, blast-radius, slo-impact, change-window, author, date]
+change-types: [additive, modificative, destructive]
+```
+
+1. **`README.md`** explaining when to use this schema.
+
+2. **`templates/*.md`** — one file per artifact in the sequence. Each template must start with YAML frontmatter and use `PSPEC:REQUIRED` / `PSPEC:OPTIONAL` markers.
+
+After creating the schema directory, update:
+
+- `tests/test_schemas_structure.py` — add the schema name to `SCHEMAS` and define its expected templates
+- `src/pspec/validators/<name>.py` — validation logic
+- `scaffold/AGENTS.md` — document the new schema in the Change classification section
+
+---
+
+## Adding a new validator
+
+Create `src/pspec/validators/<schema>.py`. A validator module must export at least one function:
+
+```python
+def validate_<schema>_change(path: Path) -> list[str]:
+    """
+    Returns a list of error strings.
+    An empty list means the change directory is valid.
+    """
+```
+
+The `validate` command (currently a stub) will resolve the validator by schema name and call the entry function.
+
+Validators should check:
+
+- Required frontmatter fields are present and non-empty
+- Artifact sequence is respected (impact-analysis exists before design, etc.)
+- `PSPEC:REQUIRED` comment markers do not appear in the final output (they must be replaced by content)
+- Schema-specific rules (e.g., `prune: true` requires approval annotation in gitops)
+
+---
+
+## Testing
+
+We use pytest. Two test strategies coexist:
+
+### Structure tests
+
+`tests/test_schemas_structure.py` and `tests/test_examples_structure.py` verify that the repository has the expected files. They use the `schemas_dir` and `examples_dir` fixtures from `conftest.py`. No mocking.
+
+These tests are the source of truth for "is this schema complete?" — when you add a schema, add its expected templates to the parametrize list.
+
+### CLI tests
+
+`tests/test_cli.py` uses `typer.testing.CliRunner` to invoke commands in-process:
+
+```python
+from typer.testing import CliRunner
+from pspec.cli import app
+
+runner = CliRunner()
+
+def test_version():
+    result = runner.invoke(app, ["--version"])
+    assert result.exit_code == 0
+    assert "pspec" in result.output
+
+def test_init_requires_schema():
+    result = runner.invoke(app, ["init", "--name", "test-change"])
+    assert result.exit_code != 0  # --schema is required
+```
+
+Run all tests:
+
+```bash
+uv run pytest
+uv run pytest tests/test_cli.py -v        # CLI only
+uv run pytest tests/test_schemas_structure.py -v  # structure only
+```
+
+---
+
+## Development setup
+
+```bash
+git clone https://github.com/felipegfalcao/platform-spec
+cd platform-spec
+uv sync --extra dev
+uv run pspec --help
+uv run pytest
+```
+
+Linting and formatting:
+
+```bash
+uv run ruff check src/ tests/
+uv run ruff format src/ tests/
+```
+
+---
+
+## Branch naming
+
+```text
+<type>/<number>-<short-slug>   # when a GitHub issue exists
+<type>/<short-slug>            # direct PR with no tracking issue
+```
+
+| Prefix | When | Example |
+|---|---|---|
+| `feat/` | New command or new schema | `feat/12-implement-pspec-init` |
+| `fix/` | Bug in CLI or validator | `fix/34-validate-missing-frontmatter` |
+| `schema/` | New or modified schema definition | `schema/add-cost-schema` |
+| `docs/` | Documentation only | `docs/update-iac-readme` |
+| `chore/` | CI, tooling, dependency bumps | `chore/bump-typer-0-27` |
+
+Rules:
+
+- Include the issue number when one exists — it makes branches traceable
+- Use kebab-case, keep the slug short
+- One concern per branch; `feat/` and `fix/` in the same branch is a smell
+
+---
+
+## AI disclosure
+
+Every commit with AI-generated content must carry an `Assisted-by:` trailer:
+
+```bash
+feat: implement pspec validate frontmatter check
+
+Assisted-by: Claude Sonnet 4.6 (autonomous)
+```
+
+Use `supervised` when a human reviewed the change line by line before committing. Use `autonomous` when the AI generated and the human accepted without detailed review.
+
+Never hide AI authorship behind the operator's git identity. A commit attributed to a human account that was authored by an AI without disclosure is a false attestation.
+
+---
+
+## Common pitfalls
+
+1. **Implementing a command without tests** — stubs are fine, but any non-stub implementation needs `test_cli.py` coverage before merge.
+
+2. **Adding a schema without updating structure tests** — `test_schemas_structure.py` will not catch missing templates if the schema name is not in the `SCHEMAS` list.
+
+3. **Changing option names in commands** — other tools and CI pipelines may call `pspec` with specific flags. Renaming `--schema` to `--type` is a breaking change; bump the minor version and update `CHANGELOG.md`.
+
+4. **Editing templates in `schemas/` without updating `scaffold/AGENTS.md`** — if a new schema changes how the framework classifies changes, the framework guide installed in user repos must reflect that.
+
+5. **Running pytest outside the venv** — `uv run pytest` resolves the interpreter correctly. A bare `pytest` may use a system interpreter that lacks the editable install, causing `ModuleNotFoundError` for `pspec`.
