@@ -37,4 +37,6 @@ def validate(
         pspec validate ./changes/migrate-frontend-appset --strict
     """
     # not implemented yet
-    typer.echo(f"pspec validate: path={path}, schema={schema}, strict={strict} — not implemented yet")
+    typer.echo(
+        f"pspec validate: path={path}, schema={schema}, strict={strict} — not implemented yet"
+    )

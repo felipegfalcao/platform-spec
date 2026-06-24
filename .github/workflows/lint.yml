@@ -53,9 +53,4 @@ jobs:
         uses: ibiqlik/action-yamllint@v3
         with:
           file_or_dir: schemas/ context/ .github/
-          config_data: |
-            extends: default
-            rules:
-              line-length: {max: 120}
-              comments: disable
-              document-start: disable
+          config_file: .yamllint.yaml

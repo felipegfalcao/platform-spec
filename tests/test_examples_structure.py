@@ -1,8 +1,6 @@
 """Tests that verify example directories have the required artifacts."""
 
 from pathlib import Path
-import pytest
-
 
 GITOPS_REQUIRED = ["proposal.md", "impact-analysis.md", "design.md", "runbook.md", "tasks.md"]
 IAC_REQUIRED = ["proposal.md", "impact-analysis.md", "design.md", "runbook.md", "tasks.md"]
@@ -11,7 +9,9 @@ INCIDENT_REQUIRED = ["postmortem.md", "rca.md"]
 
 def test_gitops_example_has_all_artifacts(gitops_example_dir: Path) -> None:
     for artifact in GITOPS_REQUIRED:
-        assert (gitops_example_dir / artifact).exists(), f"Missing {artifact} in gitops-change example"
+        assert (gitops_example_dir / artifact).exists(), (
+            f"Missing {artifact} in gitops-change example"
+        )
 
 
 def test_iac_example_has_all_artifacts(iac_example_dir: Path) -> None:
