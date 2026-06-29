@@ -10,7 +10,7 @@ authors = [
     { name = "Felipe Falcao", email = "felipegfalcao.dev@gmail.com" }
 ]
 dependencies = [
-    "typer>=0.26.7",
+    "typer>=0.26.8",
     "rich>=15.0.0",
     "pyyaml>=6.0",
     "python-hcl2>=8.1.2",
