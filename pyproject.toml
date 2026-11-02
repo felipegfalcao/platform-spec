@@ -22,7 +22,7 @@ pspec = "pspec.cli:app"
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.0",
+    "pytest>=9.2.0",
     "pytest-cov",
     "ruff",
     "mypy",
